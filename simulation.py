@@ -15,10 +15,9 @@ class GravityMovement:
        | alfa \
        |________\
            B   
-        init_position - initial posiiton of the moving object (sphere) on the scene
-        init_velocity - initial velosity
+        init_pos - initial posiiton of the moving object (sphere) on the scene
     '''
-    def __init__(self, mi=0.2, alfa=math.pi/6.0, init_pos=(0,0,0), init_v = (0,0,0)):
+    def __init__(self, mi=0.2, alfa=math.pi/6.0, init_pos=(0,0,0)):
         self.mi = mi
         self.alfa = alfa
         self.ball = sphere(pos=init_pos, radius=0.5, color=color.cyan)
@@ -31,10 +30,10 @@ class GravityMovement:
         No resistance force, only fricion.
         '''
         a = -g*(sin(self.alfa)-self.mi*cos(self.alfa))
-        newPos = vector(a*cos(self.alfa), a*sin(self.alfa), 0)*t*t/2.0
+        new_pos = vector(a*cos(self.alfa), a*sin(self.alfa), 0)*t*t/2.0
         if t!=0:
             print a/t
-        self.ball.pos =  vector(self.ball.init_pos) + newPos
+        self.ball.pos =  vector(self.ball.init_pos) + new_pos
         self.ball.trail.append(pos=self.ball.pos)
         
     def reset_position(self):
