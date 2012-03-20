@@ -27,7 +27,7 @@ class GravityMovement:
         
     def move(self, t):
         '''
-        Moves the object in rules of uniformly accelerated motion. Velocity is hard coded now.
+        Moves the object in rules of uniformly accelerated motion.
         No resistance force, only fricion.
         '''
         a = -g*(sin(self.alfa)-self.mi*cos(self.alfa))
