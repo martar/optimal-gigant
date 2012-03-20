@@ -30,8 +30,11 @@ class GravityMovement:
         Moves the object in rules of uniformly accelerated motion. Velocity is hard coded now.
         No resistance force, only fricion.
         '''
-        velocity = vector(0, -g*(sin(self.alfa)-self.mi*cos(self.alfa)), 0)*t*t/2.0
-        self.ball.pos = self.ball.pos + velocity
+        a = -g*(sin(self.alfa)-self.mi*cos(self.alfa))
+        newPos = vector(a*cos(self.alfa), a*sin(self.alfa), 0)*t*t/2.0
+        if t!=0:
+            print a/t
+        self.ball.pos =  vector(self.ball.init_pos) + newPos
         self.ball.trail.append(pos=self.ball.pos)
         
     def reset_position(self):
@@ -51,7 +54,7 @@ def create_scene():
     ball1 = GravityMovement(init_pos=(0,6,0), alfa=math.pi/3.0, mi=0.2)
     ball2 = GravityMovement(init_pos=(1,6,0), alfa=math.pi/6.0, mi=0.2)
     ball3 = GravityMovement(init_pos=(2,6,0), alfa=math.pi/3.0, mi=0.4)
-    deltat = 0.0005
+    deltat = 0.005
     t = 0
     move = True
     balls = [ball1, ball2, ball3]
