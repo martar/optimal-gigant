@@ -5,7 +5,7 @@ from scipy.integrate import odeint
 
 '''
 This module defines a first version of the skier-movement model. The model assumes
-constant friction and air resistance force that is a dependend on velocity
+constant friction and air resistance force that depends on velocity
 
 //TODO improve the comment
 '''
@@ -13,8 +13,8 @@ constant friction and air resistance force that is a dependend on velocity
 
 def _vectorfield(w, t, params):
     '''
-    Right hand side of the differential equasiton.
-    //TODO write an equasion!!
+    Right hand side of the differential equation.
+    //TODO write an equation!!
      '''
     x, v = w
     alfa, mi,k  = params
@@ -25,14 +25,14 @@ def _vectorfield(w, t, params):
 
 def solver(t, params, w=[0,0]):
     '''
-    Solves the move equasion. Move happens on an inclined plane with 
+    Solves the move equation. Move happens on an inclined plane with 
     rules of uniformly accelerated motion.
-    Air resianace force is dependent with velosity, friction is constant.
+    Air resistance force is dependent with velocity, friction is constant.
     Arguments:
         w: vector of initial conditions (for time = 0) w = [x, v]
             x: initial position (one dimension vector???)
-            v: initila velocity in m/s
-        t: time - list of discrete time samples to be considered for ex. np.linspace(0, 5, 21)
+            v: initial velocity in m/s
+        t: time - list of discrete time samples to be considered e.g. np.linspace(0, 5, 21)
         params: vector of the parameters params = (alfa, mi, k):
             alfa: slope degree (degree between  B and C)
                |\     

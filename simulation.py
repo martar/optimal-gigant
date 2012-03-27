@@ -15,10 +15,10 @@ class SkierSimulation:
         '''
         Arguments:
             end_time: time in seconds when the simulation ends. For the
-                        begginging of the simulation we set time=0 in our world
-            interval: time in seconds (may be float for ex. 0.1 ) telling about 
+                        beginning of the simulation we set time=0 in our world
+            interval: time in seconds (may be float e.g. 0.1 ) telling about 
                       density with which we want to monitor the movement
-                      (small interval means more continous movement, big interval results
+                      (small interval means more continuous movement, big interval results
                       in "stepped motion")
             time_zoom : ratio between time passing rate in the simulation to 
                         time passing rate in the ordinary world. time_zoom > 1 results
@@ -26,13 +26,13 @@ class SkierSimulation:
         '''
         # number of steps that we  consider
         steps = end_time / interval
-        # list with all discrate time moments considered in the simulation
+        # list with all discrete time moments considered in the simulation
         self.timeline = np.linspace(0, end_time, steps)
         # time_calibration specifies how fast time will be passing in the simulation
         self.time_calibration = int(time_zoom / interval)
         
-        # racer_tracs is a list that holds trac for every ragistered racer.
-        # The trac is a list of positions of the racer in all discrate moments 
+        # racer_tracs is a list that holds track for every registered racer.
+        # The track is a list of positions of the racer in all discrete moments 
         # of time considered in this simulation (in self.timeline)
         self.racer_tracs = []
         
@@ -50,7 +50,7 @@ class SkierSimulation:
         
         for moment in xrange(len(self.timeline)):
             # slow down the looping - allow only self.time_calibration
-            # number of loop enrties for a second
+            # number of loop entries for a second
             visual.rate(self.time_calibration)
             
             for ball, racer_trac in zip(balls, self.racer_tracs):
@@ -62,7 +62,7 @@ class SkierSimulation:
         Arguments:
         w: vector of initial conditions (for time = 0) w = [x, v]
             x: initial position (one dimension)
-            v: initila velocity in m/s (one dimension)
+            v: initial velocity in m/s (one dimension)
         alfa: slope degree (degree between  B and C)
                |\     
                |  \
@@ -72,7 +72,7 @@ class SkierSimulation:
                    B   
         mi: coefficient of friction       
         k: resistance factor (with mass "inside")
-        solver: function that solves move equasion for this racer
+        solver: function that solves move equation for this racer
         '''
         movement = solver( self.timeline, [alfa,mi,k], w)[:,0]
         self.racer_tracs.append(movement)
