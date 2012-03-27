@@ -1,6 +1,8 @@
-from visual import *
-import skier_with_air_resistance_force
+import visual
 import numpy as np
+from math import pi
+
+import skier_with_air_resistance_force
 
 class SkierSimulation:
     '''
@@ -40,16 +42,16 @@ class SkierSimulation:
         by add_racer method.
         '''
         # create the scene with the plane at the top
-        scene.center = vector(0,-25,0)
-        box(pos=(0,0,0), size=(12,0.2,12), color=color.green)
+        visual.scene.center = visual.vector(0,-25,0)
+        visual.box(pos=(0,0,0), size=(12,0.2,12), color=visual.color.green)
         
         # create the visual objects that represent the racers (balls)
-        balls = [ sphere(pos=(index,0,0), radius=0.5) for index in xrange(len(self.racer_tracs))]
+        balls = [ visual.sphere(pos=(index,0,0), radius=0.5) for index in xrange(len(self.racer_tracs))]
         
         for moment in xrange(len(self.timeline)):
             # slow down the looping - allow only self.time_calibration
             # number of loop enrties for a second
-            rate(self.time_calibration)
+            visual.rate(self.time_calibration)
             
             for ball, racer_trac in zip(balls, self.racer_tracs):
                 ball.pos.y = -racer_trac[moment]
@@ -76,7 +78,7 @@ class SkierSimulation:
         self.racer_tracs.append(movement)
 
 if __name__== '__main__':
-    sim = SkierSimulation()
-    sim.add_racer(0.2, math.pi/3, 0.1, skier_with_air_resistance_force.solver, w=[0,5])
-    sim.add_racer(0.2, math.pi/3, 0.01, skier_with_air_resistance_force.solver)
+    sim = SkierSimulation(end_time=3)
+    sim.add_racer(0.2, pi/3, 0.1, skier_with_air_resistance_force.solver, w=[0,5])
+    sim.add_racer(0.2, pi/3, 0.01, skier_with_air_resistance_force.solver)
     sim.run()
