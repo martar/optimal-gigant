@@ -56,7 +56,7 @@ class SkierSimulation:
             for ball, racer_trac in zip(balls, self.racer_tracs):
                 ball.pos.y = -racer_trac[moment]
             
-    def add_racer(self, mi, alfa, k, solver, w=[0,0]):
+    def add_racer(self, mi, alfa, k, m, solver, w=[0,0]):
         '''
         Adds a racer to the simulation.
         Arguments:
@@ -74,11 +74,11 @@ class SkierSimulation:
         k: resistance factor (with mass "inside")
         solver: function that solves move equation for this racer
         '''
-        movement = solver( self.timeline, [alfa,mi,k], w)[:,0]
+        movement = solver( self.timeline, [alfa,mi,k,m], w)[:,0]
         self.racer_tracs.append(movement)
 
 if __name__== '__main__':
     sim = SkierSimulation(end_time=3)
-    sim.add_racer(0.2, pi/3, 0.1, skier_with_air_resistance_force.solver, w=[0,5])
-    sim.add_racer(0.2, pi/3, 0.01, skier_with_air_resistance_force.solver)
+    sim.add_racer(0.2, pi/3, 0.1, 70, skier_with_air_resistance_force.solver, w=[0,5])
+    sim.add_racer(0.2, pi/3, 0.01, 70, skier_with_air_resistance_force.solver)
     sim.run()

@@ -15,14 +15,14 @@ def _vectorfield(w, t, params):
     '''
     Right hand side of the differential equation.
     
-    d2x/dt2 = g*sin(alfa) - mi*g*cos(alfa) - k* (dx/dt)^2 
+    d2x/dt2 = g*sin(alfa) - mi*g*cos(alfa) - k* (dx/dt)^2 /m 
     
      '''
     x, v = w
-    alfa, mi,k  = params
+    alfa, mi, k, m  = params
     
     f = [v,                                     # dx/dt
-         g*sin(alfa)-mi*g*cos(alfa)- k *v*v]    # dv/dt
+         g*sin(alfa)-mi*g*cos(alfa)- k/m*v*v]    # dv/dt
     return f
 
 def solver(t, params, w=[0,0]):
