@@ -14,7 +14,9 @@ constant friction and air resistance force that depends on velocity
 def _vectorfield(w, t, params):
     '''
     Right hand side of the differential equation.
-    //TODO write an equation!!
+    
+    d2x/dt2 = g*sin(alfa) - mi*g*cos(alfa) - k* (dx/dt)^2 
+    
      '''
     x, v = w
     alfa, mi,k  = params
