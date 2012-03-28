@@ -35,7 +35,7 @@ def solver(t, params, w=[0,0]):
             x: initial position (one dimension vector???)
             v: initial velocity in m/s
         t: time - list of discrete time samples to be considered e.g. np.linspace(0, 5, 21)
-        params: vector of the parameters params = (alfa, mi, k):
+        params: vector of the parameters params = (alfa, mi, k, m):
             alfa: slope degree (degree between  B and C)
                |\     
                |  \
@@ -44,6 +44,7 @@ def solver(t, params, w=[0,0]):
                |________\
                    B   
             mi: coefficient of friction       
-            k: resistance factor (with mass "inside")
+            k: resistance factor
+            m: skier mass in kg
     '''
     return odeint(_vectorfield, w, t, args=(params,) ) 

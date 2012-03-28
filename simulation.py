@@ -11,7 +11,7 @@ class SkierSimulation:
     the movement of the skiers. 
     '''
     
-    def __init__(self, end_time=5, interval=0.01, time_zoom=1):
+    def __init__(self, end_time=3, interval=0.01, time_zoom=1):
         '''
         Arguments:
             end_time: time in seconds when the simulation ends. For the
@@ -71,7 +71,8 @@ class SkierSimulation:
                |________\
                    B   
         mi: coefficient of friction       
-        k: resistance factor (with mass "inside")
+        k: resistance
+        m: skier mass
         solver: function that solves move equation for this racer
         '''
         movement = solver( self.timeline, [alfa,mi,k,m], w)[:,0]
