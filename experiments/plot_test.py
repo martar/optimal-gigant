@@ -7,13 +7,12 @@ mi = 0.2
 alfa = pi/3.0
 k=0.1
 t = np.linspace(0, 5, 21)
-params = [alfa,mi,k]
 
-result = skier.solver( t, params)
+result = skier.solver( t, [alfa,mi,k, 60])
 
-result2 = skier.solver( t, [alfa/2,mi,k])
+result2 = skier.solver( t, [alfa/2,mi,k, 60])
 
-result3 = skier.solver( t, [alfa,mi,0.01])
+result3 = skier.solver( t, [alfa,mi,0.01, 60])
 
 x = result[:, 0]
 v = result[:, 1]
