@@ -1,8 +1,10 @@
 import visual
 import numpy as np
-from math import pi
+from math import pi,cos,sin
 import skier_with_air_resistance_force
 import pylab
+
+from visual import vector,mag
 
 class Skier:
     '''
@@ -97,18 +99,27 @@ class SkierSimulation:
         t1 = t0 + self.interval
         if len(racer.velocities)>1 :
             prev_v = racer.velocities[-2]
-        else: prev_v = (0,0)
-        print racer.velocity()
-        result = self.solver([t0,t1], racer.position(), racer.velocity(), 
+        else: prev_v = vector(0,0)
+        
+        result_st, result_nm, beta = self.solver([t0,t1], racer.position(), racer.velocity(), 
                              racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
                              prev_v, self.B)
         # result is a numpy ndarray, column with indez 0 is for t0,
         # we are interested in column with index 1 if for t1
-        [x, v] = result.tolist()[1]
-        racer.update_position((0,x))
-        racer.update_velocity((0,v))
+        [x_st, v_st] = result_st.tolist()[1]
+        [x_nm, v_nm] = result_nm.tolist()[1]
+        
+        xy = x_nm*cos(beta) + x_st*sin(beta)
+        xx = -x_nm*sin(beta) + x_st*cos(beta)
+        x = vector(xx,xy)
+        
+        vy = v_nm*cos(beta) + v_st*sin(beta)
+        vx = -v_nm*sin(beta) + v_st*cos(beta)
+        
+        racer.update_position(x)
+        racer.update_velocity(vector(vx,vy))
         # check if he's passing finishline now
-        if x >= self.distance:
+        if mag(x) >= self.distance:
             racer.result = self.current_time
         return racer
                 
@@ -130,7 +141,7 @@ class SkierSimulation:
             # move the racers
             self.racers = [self.__move_racer(racer) for racer in self.racers]
             for ball, racer in zip(balls, self.racers):
-                ball.pos.y = -racer.position()[0]
+                ball.pos.y = -racer.position()[1]
                 
             self.current_time += self.interval
             self.timeline.append(self.current_time)
@@ -161,8 +172,8 @@ if __name__== '__main__':
     k2_B = 0.5 * C * roh * A_B
     
     k1 = 0.05 #imaginary value
-    x0 = (0,0)
-    v0 = (1,1)
+    x0 = vector(0,0)
+    v0 = vector(1,1)
     sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1)
     s_A = Skier(mi, alfa, k1, k2_A, m, x0, v0)
     #s_B = Skier(mi, alfa, k1, k2_B, m, x0, v0)
