@@ -105,8 +105,8 @@ class SkierSimulation:
         # result is a numpy ndarray, column with indez 0 is for t0,
         # we are interested in column with index 1 if for t1
         [x, v] = result.tolist()[1]
-        racer.update_position(x)
-        racer.update_velocity(v)
+        racer.update_position((0,x))
+        racer.update_velocity((0,v))
         # check if he's passing finishline now
         if x >= self.distance:
             racer.result = self.current_time
@@ -130,7 +130,8 @@ class SkierSimulation:
             # move the racers
             self.racers = [self.__move_racer(racer) for racer in self.racers]
             for ball, racer in zip(balls, self.racers):
-                ball.pos.y = -racer.position()
+                ball.pos.y = -racer.position()[0]
+                
             self.current_time += self.interval
             self.timeline.append(self.current_time)
             
@@ -161,17 +162,18 @@ if __name__== '__main__':
     
     k1 = 0.05 #imaginary value
     x0 = (0,0)
-    v0 = (0,0)
+    v0 = (1,1)
     sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1)
     s_A = Skier(mi, alfa, k1, k2_A, m, x0, v0)
-    s_B = Skier(mi, alfa, k1, k2_B, m, x0, v0)
+    #s_B = Skier(mi, alfa, k1, k2_B, m, x0, v0)
     sim.add_racer(s_A)
-    sim.add_racer(s_B)
+    #sim.add_racer(s_B)
     sim.run()
-    print 'Time difference between A and B is %f seconds' %(s_A.result - s_B.result)
-    pylab.plot(sim.timeline,s_A.positions, 
-               sim.timeline,s_B.positions,)
-    pylab.legend(('medium position', 'tucked position'), loc='lower right')
+    #print 'Time difference between A and B is %f seconds' %(s_A.result - s_B.result)
+    #pylab.plot(sim.timeline,s_A.positions, 
+    #           sim.timeline,s_B.positions,)
+    pylab.plot(sim.timeline,s_A.positions)
+    
     pylab.xlabel("time in seconds")
     pylab.ylabel("distance in meters")
     pylab.grid(True)

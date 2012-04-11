@@ -18,12 +18,15 @@ def _vectorfield(w, t, params):
      '''
     x, v_len = w
     
-    alfa, mi, k1, k2, m, prev_v, interval, v  = params
+    alfa, mi, k1, k2, m, prev_v, interval, v, R  = params
     prev_v_len = sqrt(prev_v[0]**2 + prev_v[1]**2)
-    beta = acos(v[1]/(v_len*m*g*sin(alfa)))
+    beta = acos(v[1]/v_len)
+    print beta
 
     f = [v_len,                                     # dx/dt
-         g*sin(alfa)*sin(beta) + (v_len-prev_v_len)/interval - mi*g*cos(alfa) - k1/m*v_len -k2/m*v_len*v_len]    # dv/dt
+         g*sin(alfa) + 
+         ((v_len-prev_v_len)/interval - mi*g*cos(alfa) - k1/m*v_len -k2/m*v_len*v_len)*sin(beta)
+         + v_len**2/R*cos(beta)]    # dv/dt
     return f
 
 def _vectorfield2(w, t, params):
@@ -41,7 +44,7 @@ def _vectorfield2(w, t, params):
          g*sin(alfa)-mi*g*cos(alfa)- k1/m*v -k2/m*v*v]    # dv/dt
     return f
 
-def solver(t, x0, v0, alfa, mi, k1, k2, m, prev_v, B=4):
+def solver(t, x0, v0, alfa, mi, k1, k2, m, prev_v, R=30, B=4):
     '''
     Solves the move equation. Move happens on an inclined plane with 
     rules of uniformly accelerated motion.
@@ -64,13 +67,13 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, prev_v, B=4):
         B : boundary value (in m/s) from with air drag becomes 
                 proportional to the square of the velocity.
     '''
-    print v0[0]
+    print v0
     v0_length = sqrt(v0[0]**2 + v0[1]**2)
     if v0_length <= B:
         k2 = 0
     else:
         k1 = 0
-    params = [alfa, mi, k1, k2, m, prev_v, t[1]-t[0], v0]
+    params = [alfa, mi, k1, k2, m, prev_v, t[1]-t[0], v0, R]
     x0_len = sqrt(x0[0]**2 + x0[1]**2)
     v_new = odeint(_vectorfield, [x0_len, v0_length], t, args=(params,) )
     print "v_new",v_new
