@@ -46,7 +46,7 @@ class Skier:
 
     def velocity(self):
         '''
-        returns cuttent velocity of the skier
+        returns current velocity of the skier
         '''
         return self.velocities[-1]        
     
@@ -95,8 +95,13 @@ class SkierSimulation:
         # if he hasn't reached the finishline, move him
         t0 = self.current_time
         t1 = t0 + self.interval
+        if len(racer.velocities)>1 :
+            prev_v = racer.velocities[-2]
+        else: prev_v = (0,0)
+        print racer.velocity()
         result = self.solver([t0,t1], racer.position(), racer.velocity(), 
-                             racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, self.B)
+                             racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
+                             prev_v, self.B)
         # result is a numpy ndarray, column with indez 0 is for t0,
         # we are interested in column with index 1 if for t1
         [x, v] = result.tolist()[1]
@@ -146,7 +151,7 @@ if __name__== '__main__':
     roh = 1.32 #kg*(m^(-3))
     
     m = 60 #kg
-    C = 0.6  #drag coficiant, typical values (0.4 - 1)
+    C = 0.6  #drag coefficient, typical values (0.4 - 1)
 
     A_A = 0.2 # m^2- medium position between upright and tucked
     k2_A = 0.5 * C * roh * A_A
@@ -155,8 +160,8 @@ if __name__== '__main__':
     k2_B = 0.5 * C * roh * A_B
     
     k1 = 0.05 #imaginary value
-    x0 = 0
-    v0 = 0
+    x0 = (0,0)
+    v0 = (0,0)
     sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1)
     s_A = Skier(mi, alfa, k1, k2_A, m, x0, v0)
     s_B = Skier(mi, alfa, k1, k2_B, m, x0, v0)
