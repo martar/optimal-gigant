@@ -10,7 +10,7 @@ constant friction and air drag force that depends on velocity
 '''
 
 
-def _vectorfield(w, t, params):
+def _vectorfieldx(w, t, params):
     '''
     Right hand side of the differential equation.
     
@@ -19,17 +19,24 @@ def _vectorfield(w, t, params):
      '''
     x, v_len = w
     
-    alfa, mi, k1, k2, m, prev_v, interval, v, R, beta  = params
-    prev_v_len = mag(prev_v)
-    prev_v_len = v_len
+    alfa, mi, k1, k2, m, v, ksi  = params
     #print beta
 
+    vl = mag(v)
+    if(vl==0):
+        cosinus=0
+        sinus=1
+    else:
+        cosinus = v[0]/vl
+        sinus = v[1]/vl
+    #print v_len,"x",sinus,cosinus
+    
     f = [v_len,                                     # dx/dt
-         g*sin(alfa)*sin(beta) + (v_len-prev_v_len)/interval 
-         - mi*g*cos(alfa) - k1/m*v_len -k2/m*v_len*v_len]    # dv/dt
+         v_len**2*sinus*ksi 
+         - (mi*g*cos(alfa) + k1/m*v_len + k2/m*v_len**2)*cosinus]    # dv/dt
     return f
 
-def _vectorfield2(w, t, params):
+def _vectorfieldy(w, t, params):
     '''
     Right hand side of the differential equation.
     
@@ -37,13 +44,23 @@ def _vectorfield2(w, t, params):
     
      '''
     x, v_len = w
-    alfa, mi, k1, k2, m, prev_v, interval, v, R, beta  = params
-    v_len = 0
+    alfa, mi, k1, k2, m, v, ksi  = params
+    
+    vl = mag(v)
+    if(vl==0):
+        cosinus=0
+        sinus=1
+    else:
+        cosinus = v[0]/vl
+        sinus = v[1]/vl
+    #print v_len,"y",sinus,cosinus
+    
     f = [v_len,                                     # dx/dt
-         g*sin(alfa)*cos(beta) + v_len**2/R]    # dv/dt
+         g*sin(alfa) - v_len**2*ksi*cosinus
+         - (mi*g*cos(alfa) + k1/m*v_len + k2/m*v_len*v_len)*sinus]    # dv/dt
     return f
 
-def solver(t, x0, v0, alfa, mi, k1, k2, m, prev_v, R=10000, B=4):
+def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=5, B=4):
     '''
     Solves the move equation. Move happens on an inclined plane with 
     rules of uniformly accelerated motion.
@@ -66,21 +83,21 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, prev_v, R=10000, B=4):
         B : boundary value (in m/s) from with air drag becomes 
                 proportional to the square of the velocity.
     '''
-    print v0,x0
+    #print "x,v:",x0,v0
     v0_length = mag(v0)
     if v0_length <= B:
         k2 = 0
     else:
         k1 = 0
-    beta = asin(v0[1]/v0_length)
+    #beta = asin(v0[1]/v0_length)
     #print v0,v0_length,beta
-   
-    params = [alfa, mi, k1, k2, m, prev_v, t[1]-t[0], v0, R, beta]
+    #print ksi
+    params = [alfa, mi, k1, k2, m, v0, ksi]
     x0_len = mag(x0)
-    st = odeint(_vectorfield, [x0_len, v0_length], t, args=(params,) )
-    norm = odeint(_vectorfield2, [x0_len, v0_length], t, args=(params,) )
-    print "v_new",st[1],norm[1]
+    x = odeint(_vectorfieldx, [x0[0], v0[0]], t, args=(params,) )
+    y = odeint(_vectorfieldy, [x0[1], v0[1]], t, args=(params,) )
+    ''''x = odeint(_vectorfieldx, [x0_len, v0_length], t, args=(params,) )
+    y = odeint(_vectorfieldy, [x0_len, v0_length], t, args=(params,) )'''
+    print "x\t\tv\t\t\n",x[1],"\n",y[1]
     
-    
-    
-    return st, norm, beta
+    return x, y
