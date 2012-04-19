@@ -3,11 +3,12 @@ from math import pi
 import pylab
 
 '''
+Harenda - 210 m / 600m -> alfa = atan(210/600) = ~~~21 degrees
 This experiment checks the behaviour of the skiers with different air drag
 '''
 
 mi = 0.05 #waxed skis - typical value
-alfa= pi/12 #15` degrees
+alfa= 0.33667 #Harenda
 roh = 1.32 #kg*(m^(-3))
 
 m = 60 #kg
@@ -22,12 +23,13 @@ k2_B = 0.5 * C * roh * A_B
 k1 = 0.05 #imaginary value
 x0 = 0
 v0 = 0
-sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=100)
+sim = SkierSimulation(distance=600, solver=skier_with_air_resistance_force.solver, time_zoom=100)
 s_A = Skier(mi, alfa, k1, k2_A, m, x0, v0)
 s_B = Skier(mi, alfa, k1, k2_B, m, x0, v0)
 sim.add_racer(s_A)
 sim.add_racer(s_B)
 sim.run()
+print 'Time of A %f, Time of B is %f' %(s_A.result,s_B.result)
 print 'Time difference between A and B is %f seconds' %(s_A.result - s_B.result)
 pylab.plot(sim.timeline,s_A.positions, 
            sim.timeline,s_B.positions,)

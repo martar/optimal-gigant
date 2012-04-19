@@ -7,9 +7,9 @@ This experiment checks the impact of the mass on slopes
 with different steepnes. How does the mass differance infulace the
 performace on very gentle slope and how one very steep one?
 
-Harenda - 210 m / 600m -> alfa = tan(210/600) = ~~~21 degrees
-Polczakowka - 130 m / 650 m -> alfa = tan(130/650) = ~~~11.6 degrees
-Kotelnica - 200 m / 1350 m -> alfa = tan(200/1350) = ~~~ 8.5 degress
+Harenda - 210 m / 600m -> alfa = atan(210/600) = ~~~21 degrees
+Polczakowka - 130 m / 650 m -> alfa = aatan(130/650) = ~~~11.6 degrees
+Kotelnica - 200 m / 1350 m -> alfa = atan(200/1350) = ~~~ 8.5 degress
 '''
 mi = 0.05 #waxed skis - typical value
 roh = 1.32 #kg*(m^(-3))
@@ -20,13 +20,13 @@ k1 = 0.05 #imaginary value
 x0 = 0
 v0 = 0
 
-alfa_HARENDA= 0.2027
-alfa_KOTELNICA= 0.1492
+alfa_HARENDA= 0.33667
+alfa_KOTELNICA= 0.1470
 
 m_A = 60 #kg
 m_B = 100
 
-sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1000)
+sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=10)
 s_A = Skier(mi, alfa_HARENDA, k1, k2, m_A, x0, v0)
 s_B = Skier(mi, alfa_HARENDA, k1, k2, m_B, x0, v0)
 s_A2 = Skier(mi, alfa_KOTELNICA, k1, k2, m_A, x0, v0)
