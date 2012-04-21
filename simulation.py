@@ -1,6 +1,5 @@
 import visual
-import numpy as np
-from math import pi,cos,sin
+from math import pi
 import skier_with_air_resistance_force
 import pylab
 
@@ -16,10 +15,10 @@ class Skier:
         Arguments:
             mi      - coefficient of friction. May vary for ex. on different waxes used.
             alfa    - slope degree. It is here - as a racer property, we can imagine 
-                        unprofessional parrallel slalom with slightly different slope degree for recer
+                        unprofessional parallel slalom with slightly different slope degree for racer
             k1      - factor for air friction force for small velocity
             k2      - factor for air friction force for higher velocity, dependent on
-                        drag coefficient, density of the air, projected frontal area of the skier
+                        drag coefficient, density of the air, projected front area of the skier
             m       - mass
             x0      - initial position
             v0      - initial velocity
@@ -59,7 +58,7 @@ class SkierSimulation:
     the movement of the skiers. 
     '''
     
-    def __init__(self, solver, distance=100, interval=0.01, time_zoom=10, B=4):
+    def __init__(self, solver, distance=700, interval=0.01, time_zoom=10, B=4):
         '''
         Arguments:
             solver    : solver for the simulation model
@@ -98,27 +97,19 @@ class SkierSimulation:
         t0 = self.current_time
         t1 = t0 + self.interval
         
-        result_st, result_nm = self.solver([t0,t1], racer.position(), racer.velocity(), 
+        result_x, result_y = self.solver([t0,t1], racer.position(), racer.velocity(), 
                              racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
                              B=self.B)
-        # result is a numpy ndarray, column with indez 0 is for t0,
+        # result is a numpy ndarray, column with index 0 is for t0,
         # we are interested in column with index 1 if for t1
-        [xx, vx] = result_st.tolist()[1]
-        [xy, vy] = result_nm.tolist()[1]
+        [xx, vx] = result_x.tolist()[1]
+        [xy, vy] = result_y.tolist()[1]
         
-        '''
-        xy = x_nm*cos(beta) + x_st*sin(beta)
-        xx = -x_nm*sin(beta) + x_st*cos(beta)
-        x = vector(xx,xy)
-        
-        vy = v_nm*cos(beta) + v_st*sin(beta)
-        vx = -v_nm*sin(beta) + v_st*cos(beta)
-        '''
-        x = vector(xx,xy)
-        racer.update_position(x)
+        racer.update_position(vector(xx,xy))
         racer.update_velocity(vector(vx,vy))
+        
         # check if he's passing finishline now
-        if mag(x) >= self.distance:
+        if xy >= self.distance:
             racer.result = self.current_time
         return racer
                 
@@ -173,17 +164,18 @@ if __name__== '__main__':
     
     k1 = 0.05 #imaginary value
     x0 = vector(0,0)
-    v0 = vector(0.1,1)
+    v01 = vector(0,2)
+    v02 = vector(2,0)
     sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1)
-    s_A = Skier(mi, alfa, k1, k2_A, m, x0, v0)
-    #s_B = Skier(mi, alfa, k1, k2_B, m, x0, v0)
+    s_A = Skier(mi, alfa, k1, k2_A, m, x0, v01)
+    s_B = Skier(mi, alfa, k1, k2_B, m, x0, v02)
     sim.add_racer(s_A)
-    #sim.add_racer(s_B)
+    sim.add_racer(s_B)
     sim.run()
     #print 'Time difference between A and B is %f seconds' %(s_A.result - s_B.result)
-    #pylab.plot(sim.timeline,s_A.positions, 
-    #           sim.timeline,s_B.positions,)
-    pylab.plot(sim.timeline,s_A.positions)
+    pylab.plot(sim.timeline,s_A.positions, 
+               sim.timeline,s_B.positions,)
+    #pylab.plot(sim.timeline,s_A.positions)
     #  sim.timeline,s_A.velocities)
     
     pylab.xlabel("time in seconds")
@@ -191,7 +183,7 @@ if __name__== '__main__':
     pylab.grid(True)
     pylab.show()
 
-    pylab.plot(sim.timeline,s_A.velocities)
+    pylab.plot(sim.timeline,s_A.velocities,s_B.velocities)
     pylab.xlabel("time in seconds")
     pylab.ylabel("velocity in meters per sec")
     pylab.grid(True)
