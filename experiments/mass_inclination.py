@@ -1,6 +1,7 @@
 from simulation import SkierSimulation, Skier, skier_with_air_resistance_force
 from numpy import tan, pi
 import pylab
+from visual import vector
 
 '''
 This experiment checks the impact of the mass on slopes 
@@ -17,8 +18,8 @@ C = 0.6  #drag coficiant, typical values (0.4 - 1)
 A= 0.2 # m^2- medium position between upright and tucked
 k2 = 0.5 * C * roh * A
 k1 = 0.05 #imaginary value
-x0 = 0
-v0 = 0
+x0 = vector(0,0)
+v0 = vector(0,0)
 
 alfa_HARENDA= 0.2027
 alfa_KOTELNICA= 0.1492
