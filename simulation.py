@@ -1,5 +1,5 @@
 import visual
-from math import pi
+from math import pi,sqrt
 import skier_with_air_resistance_force
 import pylab
 
@@ -58,7 +58,7 @@ class SkierSimulation:
     the movement of the skiers. 
     '''
     
-    def __init__(self, solver, distance=700, interval=0.01, time_zoom=10, B=4):
+    def __init__(self, solver, distance=200, interval=0.001, time_zoom=10, B=4):
         '''
         Arguments:
             solver    : solver for the simulation model
@@ -102,14 +102,14 @@ class SkierSimulation:
                              B=self.B)
         # result is a numpy ndarray, column with index 0 is for t0,
         # we are interested in column with index 1 if for t1
-        [xx, vx] = result_x.tolist()[1]
-        [xy, vy] = result_y.tolist()[1]
+        [xx, vx] = result_x#.tolist()[1]
+        [xy, vy] = result_y#.tolist()[1]
         
         racer.update_position(vector(xx,xy))
         racer.update_velocity(vector(vx,vy))
         
         # check if he's passing finishline now
-        if xy >= self.distance:
+        if xx >= self.distance:
             racer.result = self.current_time
         return racer
                 
@@ -123,7 +123,8 @@ class SkierSimulation:
         visual.box(pos=(0,0,0), size=(12,0.2,12), color=visual.color.green)
         # create the visual objects that represent the racers (balls)
         balls = [ visual.sphere(pos=(index,0,0), radius=0.5) for index in xrange(len(self.racers))]
-        
+        for ball in balls:
+            ball.trail  = visual.curve(color=ball.color)
         while not reduce(lambda x, y: x and y, [racer.result for racer in self.racers]):
             # slow down the looping - allow only self.time_calibration
             # number of loop entries for a second
@@ -133,6 +134,7 @@ class SkierSimulation:
             for ball, racer in zip(balls, self.racers):
                 ball.pos.y = -racer.position()[1]
                 ball.pos.x = racer.position()[0]
+                ball.trail.append(pos=ball.pos)
                 
             self.current_time += self.interval
             self.timeline.append(self.current_time)
@@ -151,6 +153,7 @@ class SkierSimulation:
 if __name__== '__main__':
     mi = 0.05 #waxed skis - typical value
     alfa= pi/12 #15` degrees
+    alfa = pi/2
     roh = 1.32 #kg*(m^(-3))
     
     m = 60 #kg
@@ -164,17 +167,17 @@ if __name__== '__main__':
     
     k1 = 0.05 #imaginary value
     x0 = vector(0,0)
-    v01 = vector(0,2)
+    v01 = vector(0,sqrt(2000))
     v02 = vector(2,0)
     sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1)
     s_A = Skier(mi, alfa, k1, k2_A, m, x0, v01)
     s_B = Skier(mi, alfa, k1, k2_B, m, x0, v02)
     sim.add_racer(s_A)
-    sim.add_racer(s_B)
+    #sim.add_racer(s_B)
     sim.run()
     #print 'Time difference between A and B is %f seconds' %(s_A.result - s_B.result)
-    pylab.plot(sim.timeline,s_A.positions, 
-               sim.timeline,s_B.positions,)
+    pylab.plot(sim.timeline,s_A.positions) 
+    #           sim.timeline,s_B.positions,)
     #pylab.plot(sim.timeline,s_A.positions)
     #  sim.timeline,s_A.velocities)
     
@@ -183,7 +186,7 @@ if __name__== '__main__':
     pylab.grid(True)
     pylab.show()
 
-    pylab.plot(sim.timeline,s_A.velocities,s_B.velocities)
+    pylab.plot(sim.timeline,s_A.velocities)#,sim.timeline,s_B.velocities)
     pylab.xlabel("time in seconds")
     pylab.ylabel("velocity in meters per sec")
     pylab.grid(True)

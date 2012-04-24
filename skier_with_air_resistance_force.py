@@ -11,36 +11,25 @@ the curvature and make the skier turn.
 '''
 
 
-def _vectorfieldx(w, t, params):
+def _vectorfield(w, t, params):
     '''
     Right hand side of the differential equation in x plane.
     
     d2x/dt2 = v**2*sinus(beta)*ksi - ( mi*g*cos(alfa) + k1*(dx/dt)/m - k2*(dx/dt)^2/m )*cos(beta) 
     
      '''
-    _, vx = w
+    _,_, vx, vy  = w
     
-    alfa, mi, k1, k2, m, vl, ksi, cosinus, sinus  = params
+    alfa, mi, k1, k2, m, ksi, cosinus, sinus  = params
+    vl = mag((vx,vy))
     
-    f = [vx,                                     # dx/dt
-         vl**2*sinus*ksi 
-         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus]    # dv/dt
-    return f
-
-def _vectorfieldy(w, t, params):
-    '''
-    Right hand side of the differential equation in y plane.
-    
-    d2x/dt2 = g*sin(alfa) - v**2*cos(beta)*ksi - ( mi*g*cos(alfa) + k1*(dx/dt)/m - k2*(dx/dt)^2/m )*sin(beta) 
-    
-     '''
-    _, vy = w
-    alfa, mi, k1, k2, m, vl, ksi, cosinus, sinus  = params
-    
-    
-    f = [vy,                                     # dx/dt
+    f = [vx,
+         vy,                                     # dx/dt
+         vl**2*sinus*ksi, 
+         #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus,
          g*sin(alfa) - vl**2*ksi*cosinus
-         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus]    # dv/dt
+         #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
+         ]    # dv/dt
     return f
 
 def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
@@ -83,17 +72,18 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
         cosinus =  v0[0]/v0_length
         sinus = v0[1]/v0_length
     
-    params = [alfa, mi, k1, k2, m, v0_length, ksi, cosinus, sinus]
+    params = [alfa, mi, k1, k2, m, ksi, cosinus, sinus]
     
-    x0_len = mag(x0)
-    x = odeint(_vectorfieldx, [x0[0], v0[0]], t, args=(params,) )
-    y = odeint(_vectorfieldy, [x0[1], v0[1]], t, args=(params,) )
-    #print "x\t\tv\t\t\n",x[1],"\n",y[1],"\t",t
+    w = odeint(_vectorfield, [x0[0], x0[1], v0[0], v0[1]], t, args=(params,) )
+    print "x\t\tv\t\t\n",w,"\t",t
     
+    wlist = w.tolist()
+    y = [wlist[1][1],wlist[1][3]]
+    x = [wlist[1][0],wlist[1][2]]
     '''
     if abs(x[1][0])<0.00001: x[1][0]=0
     if abs(x[1][1])<0.00001: x[1][1]=0
     if abs(y[1][0])<0.00001: y[1][0]=0
     if abs(y[1][1])<0.00001: y[1][1]=0
     '''
-    return x, y
+    return x,y
