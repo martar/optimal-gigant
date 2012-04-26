@@ -25,9 +25,9 @@ def _vectorfield(w, t, params):
     
     f = [vx,
          vy,                                     # dx/dt
-         vl**2*sinus*ksi, 
+         vl**2*ksi*sinus - g*sin(alfa)*cosinus*sinus, 
          #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus,
-         g*sin(alfa) - vl**2*ksi*cosinus
+         g*sin(alfa)*(cosinus**2+1) - vl**2*ksi*cosinus
          #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
          ]    # dv/dt
     return f
@@ -65,9 +65,11 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
 
     #find cos and sin(beta) from velocity vector 
     #where beta is the angle between x plane and velocity vector
-    if(v0_length==0):
+    eps = 0
+    if(v0_length<=eps):
         cosinus=0.0
         sinus=1.0
+        #ksi = -ksi
     else:
         cosinus =  v0[0]/v0_length
         sinus = v0[1]/v0_length
@@ -75,7 +77,10 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
     params = [alfa, mi, k1, k2, m, ksi, cosinus, sinus]
     
     w = odeint(_vectorfield, [x0[0], x0[1], v0[0], v0[1]], t, args=(params,) )
-    print "x\t\tv\t\t\n",w,"\t",t
+    Fdosr = m*v0_length**2*ksi
+    Fsciag = m*g*sin(alfa)*cosinus
+    print Fdosr,Fsciag,Fdosr-Fsciag
+    print w,"\t",t,"\t"
     
     wlist = w.tolist()
     y = [wlist[1][1],wlist[1][3]]

@@ -58,7 +58,7 @@ class SkierSimulation:
     the movement of the skiers. 
     '''
     
-    def __init__(self, solver, distance=200, interval=0.001, time_zoom=10, B=4):
+    def __init__(self, solver, distance=200, interval=0.01, time_zoom=1, B=4):
         '''
         Arguments:
             solver    : solver for the simulation model
@@ -167,7 +167,7 @@ if __name__== '__main__':
     
     k1 = 0.05 #imaginary value
     x0 = vector(0,0)
-    v01 = vector(0,sqrt(2000))
+    v01 = vector(0,0)   #'''sqrt(2000)'''
     v02 = vector(2,0)
     sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1)
     s_A = Skier(mi, alfa, k1, k2_A, m, x0, v01)
