@@ -25,10 +25,10 @@ def _vectorfield(w, t, params):
     
     f = [vx,
          vy,                                     # dx/dt
-         vl**2*ksi*sinus + g*sin(alfa)*cosinus*sinus
-         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus,
-         g- g*sin(alfa)*(cosinus**2) - vl**2*ksi*cosinus
-         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
+         vl**2*ksi*sinus + g*sin(alfa)*cosinus*sinus,
+         #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus,
+         g*sin(alfa) - g*sin(alfa)*(cosinus**2) - vl**2*ksi*cosinus
+         #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
          ]    # dv/dt
     return f
 

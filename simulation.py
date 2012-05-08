@@ -106,8 +106,8 @@ class SkierSimulation:
         [xx, vx] = result_x#.tolist()[1]
         [xy, vy] = result_y#.tolist()[1]
         
-        if abs(vx) < 0.001:
-            self.ksi = -self.ksi
+        if mag(vector(vx,vy)) < 0.01:
+            #self.ksi = -self.ksi
             print "zmiana"
         racer.update_position(vector(xx,xy))
         racer.update_velocity(vector(vx,vy))
@@ -173,7 +173,7 @@ if __name__== '__main__':
     x0 = vector(0,0)
     v01 = vector(0,0)   #'''sqrt(2000)'''
     v02 = vector(2,0)
-    sim = SkierSimulation(distance=100, interval=0.01, solver=skier_with_air_resistance_force.solver, time_zoom=1)
+    sim = SkierSimulation(distance=100, interval=0.0001, solver=skier_with_air_resistance_force.solver, time_zoom=1)
     s_A = Skier(mi, alfa, k1, k2_A, m, x0, v01)
     s_B = Skier(mi, alfa, k1, k2_B, m, x0, v02)
     sim.add_racer(s_A)
