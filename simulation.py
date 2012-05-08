@@ -58,7 +58,7 @@ class SkierSimulation:
     the movement of the skiers. 
     '''
     
-    def __init__(self, solver, distance=200, interval=0.01, time_zoom=1, B=4):
+    def __init__(self, solver, distance=40, interval=0.01, time_zoom=1, B=4, ksi=1/20.0):
         '''
         Arguments:
             solver    : solver for the simulation model
@@ -78,6 +78,7 @@ class SkierSimulation:
         self.solver = solver
         self.current_time = 0.
         self.B = B
+        self.ksi = ksi
         # time_calibration specifies how fast time will be passing in the simulation
         self.time_calibration = int(time_zoom / interval)
         
@@ -99,12 +100,15 @@ class SkierSimulation:
         
         result_x, result_y = self.solver([t0,t1], racer.position(), racer.velocity(), 
                              racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
-                             B=self.B)
+                             B=self.B, ksi=self.ksi)
         # result is a numpy ndarray, column with index 0 is for t0,
         # we are interested in column with index 1 if for t1
         [xx, vx] = result_x#.tolist()[1]
         [xy, vy] = result_y#.tolist()[1]
         
+        if abs(vx) < 0.001:
+            self.ksi = -self.ksi
+            print "zmiana"
         racer.update_position(vector(xx,xy))
         racer.update_velocity(vector(vx,vy))
         
@@ -169,7 +173,7 @@ if __name__== '__main__':
     x0 = vector(0,0)
     v01 = vector(0,0)   #'''sqrt(2000)'''
     v02 = vector(2,0)
-    sim = SkierSimulation(solver=skier_with_air_resistance_force.solver, time_zoom=1)
+    sim = SkierSimulation(distance=100, interval=0.01, solver=skier_with_air_resistance_force.solver, time_zoom=1)
     s_A = Skier(mi, alfa, k1, k2_A, m, x0, v01)
     s_B = Skier(mi, alfa, k1, k2_B, m, x0, v02)
     sim.add_racer(s_A)
