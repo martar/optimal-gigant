@@ -25,10 +25,11 @@ def _vectorfield(w, t, params):
     
     f = [vx,
          vy,                                     # dx/dt
-         vl**2*ksi*sinus + g*sin(alfa)*cosinus*sinus,
-         #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus,
+         vl**2*ksi*sinus + g*sin(alfa)*cosinus*sinus
+         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus
+         ,
          g*sin(alfa) - g*sin(alfa)*(cosinus**2) - vl**2*ksi*cosinus
-         #- (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
+         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
          ]    # dv/dt
     return f
 
@@ -57,45 +58,42 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
                 proportional to the square of the velocity.
     '''
 
+    '''
+    Air drag is proportional to the square of velocity
+    when the velocity is grater than some boundary value: B.
+    k1 and k2 factors control whether we take square or linear proportion
+    '''
     v0_length = mag(v0)
     if v0_length <= B:
         k2 = 0
     else:
         k1 = 0
 
-    #find cos and sin(beta) from velocity vector 
-    #where beta is the angle between x plane and velocity vector
+    '''
+    find cos and sin(beta) from velocity vector 
+    where beta is the angle between x plane and velocity vector
+    '''
     eps = 0
     if(v0_length<=eps):
         cosinus=0.0
         sinus=1.0
-        #ksi = -ksi
     else:
         cosinus =  v0[0]/v0_length
         sinus = v0[1]/v0_length
 
-    Fdosr = m*v0_length**2*ksi
-    Fsciag = m*g*sin(alfa)*cosinus
-    print Fdosr,Fsciag,Fdosr+Fsciag,"\t",
-    if Fdosr+Fsciag < 0:
-        print "AAAAAAAAAAAAAAAAAA"
-        #ksi = -1*ksi
-    print x0,"\t", v0, mag(v0)
+    #Fdosr = m*v0_length**2*ksi
+    #Fsciag = m*g*sin(alfa)*cosinus
+
+    #print x0,"\t", v0, mag(v0)
     
     params = [alfa, mi, k1, k2, m, ksi, cosinus, sinus]
 
-    
-    
+      
     w = odeint(_vectorfield, [x0[0], x0[1], v0[0], v0[1]], t, args=(params,) )
     #print w,"\t" #,t,"\t"
     
     wlist = w.tolist()
     y = [wlist[1][1],wlist[1][3]]
     x = [wlist[1][0],wlist[1][2]]
-    '''
-    if abs(x[1][0])<0.00001: x[1][0]=0
-    if abs(x[1][1])<0.00001: x[1][1]=0
-    if abs(y[1][0])<0.00001: y[1][0]=0
-    if abs(y[1][1])<0.00001: y[1][1]=0
-    '''
+
     return x,y
