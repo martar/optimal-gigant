@@ -10,7 +10,7 @@ from visual import vector
 from skier import Skier
 from simulation import SkierSimulation
 import skier_with_air_resistance_force
-from radius_processors import cutting_turns, falling_leaf, tightening_turns
+from radius_processors import cutting_turns, falling_leaf, tightening_turns,circle
 
 
 
@@ -31,32 +31,32 @@ k2_B = 0.5 * C * roh * A_B
 
 k1 = 0.05 #imaginary value
 x0 = vector(0,0)
-v01 = vector(0,0)   #'''sqrt(2000)'''
+v01 = vector(0,40)   #'''sqrt(2000)'''
 v02 = vector(2,0)
 
-ksi = 1/20.0
+kappa = 1/20.0
 sim = SkierSimulation(distance=100, interval=0.001, solver=skier_with_air_resistance_force.solver, time_zoom=100)
-s_A = Skier(mi, alfa, k1, k2_A, m, x0, v01, ksi)
+s_A = Skier(mi, alfa, k1, k2_A, m, x0, v01, kappa)
 
-s_B = Skier(mi, alfa, k1, k2_A, m, x0, v01, ksi)
+s_B = Skier(mi, alfa, k1, k2_A, m, x0, v01, kappa)
 
-s_C = Skier(mi, alfa, k1, k2_A, m, x0, v01, ksi)
+s_C = Skier(mi, alfa, k1, k2_A, m, x0, v01, kappa)
    
-# set the appriopriate stearing
+# set the appropriate steering
 #s_A.radius_processor = falling_leaf
 s_A.radius_processor = tightening_turns
 
 s_B.radius_processor = cutting_turns
 
-s_C.radius_processor = falling_leaf
+s_C.radius_processor = circle
     
-sim.add_racer(s_A)
-sim.add_racer(s_B)
+#sim.add_racer(s_A)
 sim.add_racer(s_C)
+#sim.add_racer(s_C)
 
 sim.run()
 
-pylab.plot(sim.timeline,s_A.positions) 
+pylab.plot(sim.timeline,s_C.positions) 
 
 pylab.xlabel("time in seconds")
 pylab.ylabel("distance in meters")

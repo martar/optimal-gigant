@@ -2,7 +2,7 @@ class Skier:
     '''
     Model of the skier
     '''
-    def __init__(self, mi, alfa, k1, k2, m, x0, v0, ksi ):
+    def __init__(self, mi, alfa, k1, k2, m, x0, v0, kappa ):
         '''
         Model of the skier. Arguments that models the races:
         Arguments:
@@ -15,9 +15,9 @@ class Skier:
             m       - mass
             x0      - initial position
             v0      - initial velocity
-            ksi     - initial inverse of radius of the curve (1/r)
+            kappa     - initial inverse of radius of the curve (1/r)
         '''
-        self.mi, self.alfa, self.k1, self.k2, self.m, self.ksi = mi, alfa, k1, k2, m, ksi
+        self.mi, self.alfa, self.k1, self.k2, self.m, self.kappa = mi, alfa, k1, k2, m, kappa
         
         # values of position and velocity. Current values
         # are on the tail of the list
@@ -38,7 +38,7 @@ class Skier:
         self.velocities.append(v)
         # steat the racer's turn based on velocity update, it stearin function if provided 
         if self.radius_processor:
-            self.ksi = self.radius_processor(self)  
+            self.kappa = self.radius_processor(self)  
              
     def position(self):
         '''

@@ -2,6 +2,7 @@ from math import sin, cos
 # standard acceleration of gravity
 from scipy.constants.constants import g
 from scipy.integrate import odeint
+from numpy import sign
 from visual import mag
 
 '''
@@ -15,25 +16,31 @@ def _vectorfield(w, t, params):
     '''
     Right hand side of the differential equation in x plane.
     
-    d2x/dt2 = v**2*sinus(beta)*ksi - ( mi*g*cos(alfa) + k1*(dx/dt)/m - k2*(dx/dt)^2/m )*cos(beta) 
+    d2x/dt2 = v**2*sinus(beta)*kappa - ( mi*g*cos(alfa) + k1*(dx/dt)/m - k2*(dx/dt)^2/m )*cos(beta) 
     
      '''
     _,_, vx, vy  = w
     
-    alfa, mi, k1, k2, m, ksi, cosinus, sinus  = params
+    alfa, mi, k1, k2, m, kappa, cosinus, sinus  = params
     vl = mag((vx,vy))
+    
+    f_r = vl**2*abs(kappa) + sign(kappa)*g*sin(alfa)*cosinus
+    if f_r < 0:
+        f_r = sign(kappa)*g*sin(alfa)*cosinus
+        #print "zmiana"
+    
     
     f = [vx,
          vy,                                     # dx/dt
-         vl**2*ksi*sinus + g*sin(alfa)*cosinus*sinus
+         f_r*sinus*sign(kappa)
          - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus
          ,
-         g*sin(alfa) - g*sin(alfa)*(cosinus**2) - vl**2*ksi*cosinus
+         g*sin(alfa) - f_r*cosinus*sign(kappa)
          - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
          ]    # dv/dt
     return f
 
-def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
+def solver(t, x0, v0, alfa, mi, k1, k2, m, kappa=1/20.0, B=4):
     '''
     Solves the move equation. Move happens on an inclined plane with 
     rules of uniformly accelerated motion.
@@ -53,7 +60,7 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
         k1: air drag factor
         k2: air drag 
         m : skier mass in kg
-        ksi: curvature - reciprocal of the radius (positive makes right turn)
+        kappa: curvature - reciprocal of the radius (positive makes right turn)
         B : boundary value (in m/s) from with air drag becomes 
                 proportional to the square of the velocity.
     '''
@@ -73,7 +80,7 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
     find cos and sin(beta) from velocity vector 
     where beta is the angle between x plane and velocity vector
     '''
-    eps = 0
+    eps = 0.00001
     if(v0_length<=eps):
         cosinus=0.0
         sinus=1.0
@@ -81,12 +88,12 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, ksi=1/20.0, B=4):
         cosinus =  v0[0]/v0_length
         sinus = v0[1]/v0_length
 
-    #Fdosr = m*v0_length**2*ksi
+    #Fdosr = m*v0_length**2*kappa
     #Fsciag = m*g*sin(alfa)*cosinus
 
     #print x0,"\t", v0, mag(v0)
     
-    params = [alfa, mi, k1, k2, m, ksi, cosinus, sinus]
+    params = [alfa, mi, k1, k2, m, kappa, cosinus, sinus]
 
       
     w = odeint(_vectorfield, [x0[0], x0[1], v0[0], v0[1]], t, args=(params,) )
