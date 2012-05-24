@@ -17,7 +17,7 @@ from radius_processors import cutting_turns, falling_leaf, tightening_turns,circ
 
 mi = 0.05 #waxed skis - typical value
 
-alfa = pi/2
+alfa = pi/6
 roh = 1.32 #kg*(m^(-3))
 
 m = 60 #kg
@@ -31,7 +31,7 @@ k2_B = 0.5 * C * roh * A_B
 
 k1 = 0.05 #imaginary value
 x0 = vector(0,0)
-v01 = vector(0,40)   #'''sqrt(2000)'''
+v01 = vector(0,23)   #'''sqrt(2000)'''
 v02 = vector(2,0)
 
 kappa = 1/20.0
@@ -44,11 +44,11 @@ s_C = Skier(mi, alfa, k1, k2_A, m, x0, v01, kappa)
    
 # set the appropriate steering
 #s_A.radius_processor = falling_leaf
-s_A.radius_processor = tightening_turns
+s_A.radius_processors.append(tightening_turns)
 
-s_B.radius_processor = cutting_turns
+s_B.radius_processors.append(cutting_turns)
 
-s_C.radius_processor = circle
+s_C.radius_processors.append(circle)
     
 #sim.add_racer(s_A)
 sim.add_racer(s_C)
@@ -60,5 +60,11 @@ pylab.plot(sim.timeline,s_C.positions)
 
 pylab.xlabel("time in seconds")
 pylab.ylabel("distance in meters")
+pylab.grid(True)
+pylab.show()
+
+pylab.plot(sim.timeline,s_C.velocities)
+pylab.xlabel("time in seconds")
+pylab.ylabel("velocity in meters per sec")
 pylab.grid(True)
 pylab.show()

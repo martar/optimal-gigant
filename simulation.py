@@ -49,13 +49,16 @@ class SkierSimulation:
         result_x, result_y = self.solver([t0,t1], racer.position(), racer.velocity(), 
                              racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
                              B=self.B, kappa=racer.kappa)
+        #FIXME
         # result is a numpy ndarray, column with index 0 is for t0,
         # we are interested in column with index 1 if for t1
-        [xx, vx] = result_x#.tolist()[1]
-        [xy, vy] = result_y#.tolist()[1]
+        [xx, vx] = result_x
+        [xy, vy] = result_y
         
         racer.update_position(visual.vector(xx,xy))
         racer.update_velocity(visual.vector(vx,vy))
+        #FIXME steering
+        racer.update_kappa()
         
         # check if he's passing finishline now
         if xy >= self.distance:

@@ -1,4 +1,6 @@
-from math import sin, cos
+# -*- coding: utf-8 -*-
+
+from math import sin, cos, sqrt
 # standard acceleration of gravity
 from scipy.constants.constants import g
 from scipy.integrate import odeint
@@ -24,19 +26,28 @@ def _vectorfield(w, t, params):
     alfa, mi, k1, k2, m, kappa, cosinus, sinus  = params
     vl = mag((vx,vy))
     
-    f_r = vl**2*abs(kappa) + sign(kappa)*g*sin(alfa)*cosinus
+    f_R = vl**2*abs(kappa)
+    f_r = f_R + sign(kappa)*g*sin(alfa)*cosinus
+    
+    '''
     if f_r < 0:
         f_r = sign(kappa)*g*sin(alfa)*cosinus
-        #print "zmiana"
-    
+        f_R = 0
+    '''
+     
+    '''todo wiki
+    na sile nacisku wplywa tez sila od�rodkowa, jak jad� po kole to tarcie si� zwi�ksza, 
+    i wida� �e jak jad� na wprost to mog� dalej pojecha�
+    '''
+    N = sqrt ( (g*cos(alfa))**2 + (f_R)**2 )
     
     f = [vx,
          vy,                                     # dx/dt
          f_r*sinus*sign(kappa)
-         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*cosinus
+         - (mi*N + k1/m*vl + k2/m*vl**2)*cosinus
          ,
          g*sin(alfa) - f_r*cosinus*sign(kappa)
-         - (mi*g*cos(alfa) + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
+         - (mi*N + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
          ]    # dv/dt
     return f
 
@@ -94,9 +105,9 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, kappa=1/20.0, B=4):
     #print x0,"\t", v0, mag(v0)
     
     params = [alfa, mi, k1, k2, m, kappa, cosinus, sinus]
-
       
     w = odeint(_vectorfield, [x0[0], x0[1], v0[0], v0[1]], t, args=(params,) )
+    
     #print w,"\t" #,t,"\t"
     
     wlist = w.tolist()
