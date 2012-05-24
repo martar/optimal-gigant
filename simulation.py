@@ -1,4 +1,5 @@
 import visual
+from visual import mag
 
 class SkierSimulation:
     '''
@@ -46,9 +47,23 @@ class SkierSimulation:
         t0 = self.current_time
         t1 = t0 + self.interval
         
+        '''
+        find cos_beta and sin_beta from velocity vector 
+        where beta is the angle between x plane and velocity vector
+        '''
+        v0_length = mag(racer.velocity())
+        eps = 0.00001
+        if(v0_length<=eps):
+            cos_beta=0.0
+            sin_beta=1.0
+        else:
+            cos_beta =  racer.velocity()[0]/v0_length
+            sin_beta = racer.velocity()[1]/v0_length
+            
         result_x, result_y = self.solver([t0,t1], racer.position(), racer.velocity(), 
-                             racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
-                             B=self.B, kappa=racer.kappa)
+                                 sin_beta, cos_beta,
+                                 racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
+                                 B=self.B, kappa=racer.kappa)
         #FIXME
         # result is a numpy ndarray, column with index 0 is for t0,
         # we are interested in column with index 1 if for t1

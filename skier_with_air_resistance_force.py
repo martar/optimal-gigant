@@ -27,6 +27,7 @@ def _vectorfield(w, t, params):
     vl = mag((vx,vy))
     
     f_R = vl**2*abs(kappa)
+    # it's not the valu of the force -> no mass in eq
     f_r = f_R + sign(kappa)*g*sin(alfa)*cosinus
     
     '''
@@ -51,7 +52,7 @@ def _vectorfield(w, t, params):
          ]    # dv/dt
     return f
 
-def solver(t, x0, v0, alfa, mi, k1, k2, m, kappa=1/20.0, B=4):
+def solver(t, x0, v0, sin_beta, cos_beta, alfa, mi, k1, k2, m, kappa=1/20.0, B=4):
     '''
     Solves the move equation. Move happens on an inclined plane with 
     rules of uniformly accelerated motion.
@@ -59,6 +60,7 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, kappa=1/20.0, B=4):
     Arguments:
         x0: initial position - vector
         v0: initial velocity in m/s - vector
+        cos_beta,sin_beta - beta is the angle between x plane and velocity vector
         t: time - list of discrete time samples to be considered e.g. np.linspace(0, 5, 21)
         alfa: slope degree (degree between  B and C)
            |\     
@@ -86,25 +88,8 @@ def solver(t, x0, v0, alfa, mi, k1, k2, m, kappa=1/20.0, B=4):
         k2 = 0
     else:
         k1 = 0
-
-    '''
-    find cos and sin(beta) from velocity vector 
-    where beta is the angle between x plane and velocity vector
-    '''
-    eps = 0.00001
-    if(v0_length<=eps):
-        cosinus=0.0
-        sinus=1.0
-    else:
-        cosinus =  v0[0]/v0_length
-        sinus = v0[1]/v0_length
-
-    #Fdosr = m*v0_length**2*kappa
-    #Fsciag = m*g*sin(alfa)*cosinus
-
-    #print x0,"\t", v0, mag(v0)
     
-    params = [alfa, mi, k1, k2, m, kappa, cosinus, sinus]
+    params = [alfa, mi, k1, k2, m, kappa, cos_beta, sin_beta]
       
     w = odeint(_vectorfield, [x0[0], x0[1], v0[0], v0[1]], t, args=(params,) )
     
