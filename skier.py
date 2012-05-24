@@ -24,9 +24,9 @@ class Skier:
         self.positions = [x0]
         self.velocities = [v0]
         
-        # functions that control the movement - that is
+        # function that control the movement - that is
         # control changing of the radius
-        self.radius_processors = []
+        self.controller = None
         
         # time in second of the finish. None if not finished yet
         self.result = None
@@ -39,8 +39,8 @@ class Skier:
         # steat the racer's turn based on velocity update, it stearin function if provided 
 
     def update_kappa(self):
-        for processor in self.radius_processors:
-            self.kappa = processor(self)  
+        if self.controller:
+            self.kappa = self.controller.control(racer=self)  
              
     def position(self):
         '''
