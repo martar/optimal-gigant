@@ -23,6 +23,7 @@ class Skier:
         # are on the tail of the list
         self.positions = [x0]
         self.velocities = [v0]
+        self.kappas = [kappa]
         
         # function that control the movement - that is
         # control changing of the radius
@@ -41,7 +42,8 @@ class Skier:
     def update_kappa(self):
         if self.controller:
             self.kappa = self.controller.control(racer=self)  
-             
+        self.kappas.append(self.kappa)
+        
     def position(self):
         '''
         returns current position of the skier

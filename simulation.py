@@ -42,6 +42,7 @@ class SkierSimulation:
         if racer.result:
             racer.update_position(racer.position())
             racer.update_velocity(racer.velocity())
+            racer.update_kappa()
             return racer
         # if he hasn't reached the finishline, move him
         t0 = self.current_time
@@ -53,6 +54,7 @@ class SkierSimulation:
         '''
         v0_length = mag(racer.velocity())
         eps = 0.00001
+        
         if(v0_length<=eps):
             cos_beta=0.0
             sin_beta=1.0
