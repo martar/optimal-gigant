@@ -38,6 +38,7 @@ if __name__ == '__main__':
     import skier_with_air_resistance_force
     from simulation import SkierSimulation
     from hop_turn_controller import HopTurningController,StraightGoingController,RightTurnController,LeftTurnController
+    import pylab
     mi = 0.05 #waxed skis - typical value
     
     alfa = pi/6
@@ -62,8 +63,16 @@ if __name__ == '__main__':
                                     left_turning_controller=LeftTurnController(kappa),
                                     straight_controller=StraightGoingController(), 
                                     kappa=kappa, boundary_val=0.2)
-    sim = SkierSimulation(distance=200, interval=0.001, solver=skier_with_air_resistance_force.solver, time_zoom=100)
+    sim = SkierSimulation(distance=200, interval=0.01, solver=skier_with_air_resistance_force.solver, time_zoom=100)
     sim.add_racer(racer)
     sim.add_racer(racer2)
     sim.run()
     
+    pylab.plot(sim.timeline,racer.kappas, 
+           sim.timeline,racer2.kappas,)
+    
+    pylab.legend(('skier A', 'skier B'), loc='lower right')
+    pylab.xlabel("time in seconds")
+    pylab.ylabel("kappa in 1/meters")
+    pylab.grid(True)
+    pylab.show()
