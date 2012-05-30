@@ -4,19 +4,19 @@ class RightTurnController(Controller):
     def __init__(self, kappa):
         self.kappa = kappa
         
-    def desired_curvature(self, racer, *args, **kwargs):
+    def desired_curvature(self, position, kappa, *args, **kwargs):
         return self.kappa
 
 class LeftTurnController(Controller):
     def __init__(self, kappa):
         self.kappa = kappa
         
-    def desired_curvature(self, racer, *args, **kwargs):
+    def desired_curvature(self, position, kappa,  *args, **kwargs):
         return -self.kappa
 
 class StraightGoingController(Controller):
     
-    def desired_curvature(self, racer, *args, **kwargs):
+    def desired_curvature(self, position, kappa,  *args, **kwargs):
         return 0
 
 class HopTurningController:
@@ -31,7 +31,8 @@ class HopTurningController:
     
     FIXME kappa can't be equal to zero
     '''
-    def __init__(self, right_turning_controller, left_turning_controller, straight_controller, kappa, boundary_val = 0.2):
+    def __init__(self, slalom, right_turning_controller, left_turning_controller, straight_controller, kappa, boundary_val = 0.2):
+        self.slalom = slalom
         self.right_turning_controller = right_turning_controller
         self.left_turning_controller = left_turning_controller
         self.straight_controller = straight_controller
@@ -39,19 +40,23 @@ class HopTurningController:
         #values for evaluating the boundaries of changes
         self.boundary = boundary_val/kappa
         self.planned_r = 1/kappa
+        
+        # positions of previous and next gate
+        self.prev_gate = None
+        self.next_gate = None
     
-    def control(self, racer, *args, **kwargs):
-        start_x = racer.positions[0][0]
-        cur_x = racer.position()[0]
-
+    def control(self, position, kappa, start_x, sin_beta,cos_beta,*args, **kwargs):
+        x,_,_ = position
+        cur_x = x
+        
         #find the boundaries of the changes - left and right        
         lbound = start_x + self.planned_r - self.boundary
         rbound = start_x + self.planned_r + self.boundary
         
         #choose the controller basing on the current position
         if cur_x < lbound:
-            return self.right_turning_controller.control(racer, *args, **kwargs)
+            return self.right_turning_controller.control(position, kappa, *args, **kwargs)
         elif cur_x > rbound:
-            return self.left_turning_controller.control(racer, *args, **kwargs)
+            return self.left_turning_controller.control(position, kappa, *args, **kwargs)
         else:
-            return self.straight_controller.control(racer, *args, **kwargs)
+            return self.straight_controller.control(position, kappa, *args, **kwargs)

@@ -5,8 +5,8 @@ class SampleCurvatureController(Controller):
 
 class SampleChangeController(Controller):
     
-    def desired_curvature(self, racer, *args, **kwargs):
-        return -racer.kappa
+    def desired_curvature(self, position, kappa, *args, **kwargs):
+        return -kappa
 
 
 class DirectionDecisionController:
@@ -20,16 +20,16 @@ class DirectionDecisionController:
         self.x_change= x_change
         self.recently_passed_change = False
     
-    def control(self, racer, *args, **kwargs):
-        x,y = racer.position()[0], racer.position()[1]
+    def control(self, position, kappa, *args, **kwargs):
+        x,y,_ = position
         if x > self.x_change-0.1 and x <  self.x_change+0.1:
             if not self.recently_passed_change:
                 self.recently_passed_change = True
                 # change controller should least only for one quantum of time - change the sign
-                return self.change_controller.control(racer, *args, **kwargs)
+                return self.change_controller.control((x,y), kappa,  *args, **kwargs)
         else:
             self.recently_passed_change = False
-        return self.movement_controller.control(racer, *args, **kwargs)
+        return self.movement_controller.control((x,y), kappa, *args, **kwargs)
     
 if __name__ == '__main__':
     from skier import Skier
@@ -55,15 +55,19 @@ if __name__ == '__main__':
     k1 = 0.05 #imaginary value
     x0 = vector(0,0)
     v0 = vector(0,19)   #'''sqrt(2000)'''
-    racer = Skier(mi, alfa, k1, k2, m, x0, v0, kappa)
-    racer2 = Skier(mi, alfa, k1, k2, m, x0, v0, kappa)
-    racer.controller = DirectionDecisionController(movement_controller=SampleCurvatureController(),
+    slalom = [(0,0)]
+    B = 4
+    solver=skier_with_air_resistance_force.solver
+    kappa_controller_A = DirectionDecisionController(movement_controller=SampleCurvatureController(),
                                                   change_controller=SampleChangeController())
-    racer2.controller = HopTurningController(right_turning_controller=RightTurnController(kappa),
+    kappa_controller_B = HopTurningController(slalom=slalom, right_turning_controller=RightTurnController(kappa),
                                     left_turning_controller=LeftTurnController(kappa),
                                     straight_controller=StraightGoingController(), 
                                     kappa=kappa, boundary_val=0.2)
-    sim = SkierSimulation(distance=200, interval=0.01, solver=skier_with_air_resistance_force.solver, time_zoom=100)
+    racer = Skier(mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom,solver, kappa_controller_A)
+    racer2 = Skier(mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom, solver, kappa_controller_B)
+
+    sim = SkierSimulation(distance=200, interval=0.01, time_zoom=100)
     sim.add_racer(racer)
     sim.add_racer(racer2)
     sim.run()

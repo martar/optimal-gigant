@@ -8,7 +8,7 @@ class SkierSimulation:
     the movement of the skiers. 
     '''
     
-    def __init__(self, solver, distance=40, interval=0.01, time_zoom=1, B=4):
+    def __init__(self, distance=40, interval=0.01, time_zoom=1, B=4):
         '''
         Arguments:
             solver    : solver for the simulation model
@@ -25,7 +25,6 @@ class SkierSimulation:
         '''
         self.interval = interval
         self.distance = distance
-        self.solver = solver
         self.current_time = 0.
         self.B = B
         # time_calibration specifies how fast time will be passing in the simulation
@@ -36,49 +35,26 @@ class SkierSimulation:
         # racers is a list that holds registered racers.
         self.racers = []
 
+    
+        #FIXME
+        # result is a numpy ndarray, column with index 0 is for t0,
+        # we are interested in column with index 1 if for t1
+
+        
     def __move_racer(self, racer):
         # if the racer finished the race, 
         # let him stay at the finishline
         if racer.result:
-            racer.update_position(racer.position())
-            racer.update_velocity(racer.velocity())
-            racer.update_kappa()
+            racer.stay_still()
             return racer
         # if he hasn't reached the finishline, move him
         t0 = self.current_time
         t1 = t0 + self.interval
-        
-        '''
-        find cos_beta and sin_beta from velocity vector 
-        where beta is the angle between x plane and velocity vector
-        '''
-        v0_length = mag(racer.velocity())
-        eps = 0.00001
-        
-        if(v0_length<=eps):
-            cos_beta=0.0
-            sin_beta=1.0
-        else:
-            cos_beta =  racer.velocity()[0]/v0_length
-            sin_beta = racer.velocity()[1]/v0_length
-            
-        result_x, result_y = self.solver([t0,t1], racer.position(), racer.velocity(), 
-                                 sin_beta, cos_beta,
-                                 racer.alfa, racer.mi, racer.k1, racer.k2, racer.m, 
-                                 B=self.B, kappa=racer.kappa)
-        #FIXME
-        # result is a numpy ndarray, column with index 0 is for t0,
-        # we are interested in column with index 1 if for t1
-        [xx, vx] = result_x
-        [xy, vy] = result_y
-        
-        racer.update_position(visual.vector(xx,xy))
-        racer.update_velocity(visual.vector(vx,vy))
-        #FIXME steering
-        racer.update_kappa()
+    
+        racer.move(t0, t1)
         
         # check if he's passing finishline now
-        if xy >= self.distance:
+        if racer.positions[-1][1] >= self.distance:
             racer.result = self.current_time
         return racer
                 
@@ -99,10 +75,12 @@ class SkierSimulation:
             # number of loop entries for a second
             visual.rate(self.time_calibration)
             # move the racers
-            self.racers = [self.__move_racer(racer) for racer in self.racers]
+            for racer in self.racers:
+                self.__move_racer(racer) 
+                
             for ball, racer in zip(balls, self.racers):
-                ball.pos.y = -racer.position()[1]
-                ball.pos.x = racer.position()[0]
+                ball.pos.y = -racer.positions[-1][1]
+                ball.pos.x = racer.positions[-1][0]
                 ball.trail.append(pos=ball.pos)
                 
             self.current_time += self.interval
