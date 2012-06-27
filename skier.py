@@ -4,7 +4,7 @@ class Skier:
     '''
     Model of the skier
     '''
-    def __init__(self, mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom, solver, kappa_controller):
+    def __init__(self, mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom, solver, kappa_controller, sign_omega=-1):
         '''
         Model of the skier. Arguments that models the races:
         Arguments:
@@ -21,6 +21,11 @@ class Skier:
             slalom - list of tuples with slalom gate's positions
             solver - solver of phicics move equation
             kappa_controller - controller of kappa changes - stearing
+            sign_omega - signum of first derivative of fi ( angular velocity) - its value is a direction 
+                of the movement. It's value is 
+                    1, when skier turns left
+                    0, when skier go straigth
+                    -1, when skier turns right
         '''
         self.mi, self.alfa, self.k1, self.k2, self.B, self.m= mi, alfa, k1, k2, B,  m
         self.slalom = slalom
@@ -30,6 +35,7 @@ class Skier:
         self.positions = [x0]
         self.velocities = [v0]
         self.kappas = [kappa]
+        self.sign_omegas = [sign_omega]
         
         # time in second of the finish. None if not finished yet
         self.result = None
@@ -59,7 +65,7 @@ class Skier:
         result_x, result_y = self.solver([t0,t1], self.positions[-1], self.velocities[-1],
                                  sin_beta, cos_beta,
                                  self.alfa, self.mi, self.k1, self.k2, self.m, 
-                                 B=self.B, kappa=self.kappas[-1])
+                                 B=self.B, kappa=self.kappas[-1], sign_omega=self.sign_omegas[-1])
         return result_x, result_y       
      
     def move(self, t0, t1):
@@ -70,10 +76,12 @@ class Skier:
         (xx, vx), (xy, vy) = self.__compute_next_position_and_velocity(t0,t1, sin_beta, cos_beta)
         self.positions.append(visual.vector(xx,xy))
         self.velocities.append(visual.vector(vx,vy))
-        new_kappa = self.kappa_controller.control(position=self.positions[-1], kappa=self.kappas[-1], 
+        new_kappa, new_sign_omega = self.kappa_controller.control(position=self.positions[-1], kappa=self.kappas[-1],
+                                                  sign_omega=self.sign_omegas[-1],
                                                   start_x=self.positions[0][0], cos_beta=cos_beta, sin_beta=sin_beta)
         self.kappas.append(new_kappa)
-    
+        self.sign_omegas.append(new_sign_omega)
+        
     def stay_still(self):
         '''
         stay in the same place, between time quant
@@ -81,6 +89,7 @@ class Skier:
         self.positions.append((self.positions[-1]))
         self.velocities.append((self.velocities[-1]))
         self.kappas.append(self.kappas[1])
+        self.sign_omegas.append(self.sign_omegas[-1])
         
     def __next_gate(self):
         '''

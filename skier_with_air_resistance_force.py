@@ -23,16 +23,16 @@ def _vectorfield(w, t, params):
      '''
     _,_, vx, vy  = w
     
-    alfa, mi, k1, k2, m, kappa, cosinus, sinus  = params
+    alfa, mi, k1, k2, m, kappa, cosinus, sinus, sign_omega  = params
     vl = mag((vx,vy))
     
     f_R = vl**2*abs(kappa)
     # it's not the valu of the force -> no mass in eq
-    f_r = f_R + sign(kappa)*g*sin(alfa)*cosinus
+    f_r = f_R + sign_omega*g*sin(alfa)*cosinus
     
-    '''
+    ''' 
     if f_r < 0:
-        f_r = sign(kappa)*g*sin(alfa)*cosinus
+        f_r = sign_omega*g*sin(alfa)*cosinus
         f_R = 0
     '''
      
@@ -44,15 +44,15 @@ def _vectorfield(w, t, params):
     
     f = [vx,
          vy,                                     # dx/dt
-         f_r*sinus*sign(kappa)
+         f_r*sinus*sign_omega
          - (mi*N + k1/m*vl + k2/m*vl**2)*cosinus
          ,
-         g*sin(alfa) - f_r*cosinus*sign(kappa)
+         g*sin(alfa) - f_r*cosinus*sign_omega
          - (mi*N + k1/m*vl + k2/m*vl**2)*sinus                                     # dx/dt
          ]    # dv/dt
     return f
 
-def solver(t, x0, v0, sin_beta, cos_beta, alfa, mi, k1, k2, m, kappa=1/20.0, B=4):
+def solver(t, x0, v0, sin_beta, cos_beta, alfa, mi, k1, k2, m, sign_omega, kappa=1/20.0, B=4):
     '''
     Solves the move equation. Move happens on an inclined plane with 
     rules of uniformly accelerated motion.
@@ -89,7 +89,7 @@ def solver(t, x0, v0, sin_beta, cos_beta, alfa, mi, k1, k2, m, kappa=1/20.0, B=4
     else:
         k1 = 0
     
-    params = [alfa, mi, k1, k2, m, kappa, cos_beta, sin_beta]
+    params = [alfa, mi, k1, k2, m, kappa, cos_beta, sin_beta, sign_omega]
       
     w = odeint(_vectorfield, [x0[0], x0[1], v0[0], v0[1]], t, args=(params,) )
     

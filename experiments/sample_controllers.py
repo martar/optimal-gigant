@@ -5,31 +5,31 @@ class SampleCurvatureController(Controller):
 
 class SampleChangeController(Controller):
     
-    def desired_curvature(self, position, kappa, *args, **kwargs):
-        return -kappa
+    def desired_curvature(self, position, kappa, sign_omega, *args, **kwargs):
+        return kappa, -sign_omega
 
 
 class DirectionDecisionController:
     '''
     Sample master controller that decides when other controllers should be used    
     '''
-    def __init__(self,  movement_controller, change_controller, x_change=10):
+    def __init__(self,  movement_controller, change_controller, x_change=25):
         self.movement_controller = movement_controller
         self.change_controller = change_controller
         # what is the x when we should change direction
         self.x_change= x_change
         self.recently_passed_change = False
     
-    def control(self, position, kappa, *args, **kwargs):
+    def control(self, position, kappa, sign_omega, *args, **kwargs):
         x,y,_ = position
-        if x > self.x_change-0.1 and x <  self.x_change+0.1:
+        if abs(x) > self.x_change-0.2 and abs(x) <  self.x_change+0.2:
             if not self.recently_passed_change:
                 self.recently_passed_change = True
                 # change controller should least only for one quantum of time - change the sign
-                return self.change_controller.control((x,y), kappa,  *args, **kwargs)
+                return self.change_controller.control((x,y), kappa, sign_omega, *args, **kwargs)
         else:
             self.recently_passed_change = False
-        return self.movement_controller.control((x,y), kappa, *args, **kwargs)
+        return self.movement_controller.control((x,y), kappa, sign_omega, *args, **kwargs)
     
 if __name__ == '__main__':
     from skier import Skier
@@ -71,6 +71,15 @@ if __name__ == '__main__':
     sim.add_racer(racer)
     sim.add_racer(racer2)
     sim.run()
+    
+    pylab.plot(sim.timeline,racer.sign_omegas, 
+           sim.timeline,racer2.sign_omegas,)
+    
+    pylab.legend(('skier A', 'skier B'), loc='lower right')
+    pylab.xlabel("time in seconds")
+    pylab.ylabel("signum of omega")
+    pylab.grid(True)
+    pylab.show()
     
     pylab.plot(sim.timeline,racer.kappas, 
            sim.timeline,racer2.kappas,)

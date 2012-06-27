@@ -4,20 +4,26 @@ class RightTurnController(Controller):
     def __init__(self, kappa):
         self.kappa = kappa
         
-    def desired_curvature(self, position, kappa, *args, **kwargs):
-        return self.kappa
+    def desired_curvature(self, position, kappa, sign_omega, *args, **kwargs):
+        # we want to always use kappa value declared at the init, 
+        # we don't care about most recent kappa, we just change the 
+        # direction
+        return self.kappa, -1
 
 class LeftTurnController(Controller):
     def __init__(self, kappa):
         self.kappa = kappa
         
-    def desired_curvature(self, position, kappa,  *args, **kwargs):
-        return -self.kappa
+    def desired_curvature(self, position, kappa, sign_omega, *args, **kwargs):
+        # we want to always use kappa value declared at the init, 
+        # we don't care about most recent kappa, we just change the 
+        # direction
+        return self.kappa, 1
 
 class StraightGoingController(Controller):
     
-    def desired_curvature(self, position, kappa,  *args, **kwargs):
-        return 0
+    def desired_curvature(self, position, kappa, sign_omega, *args, **kwargs):
+        return 0, 0
 
 class HopTurningController:
     '''
@@ -45,18 +51,18 @@ class HopTurningController:
         self.prev_gate = None
         self.next_gate = None
     
-    def control(self, position, kappa, start_x, sin_beta,cos_beta,*args, **kwargs):
+    def control(self, position, kappa, start_x, sin_beta,cos_beta,sign_omega, *args, **kwargs):
         x,_,_ = position
         cur_x = x
-        
+
         #find the boundaries of the changes - left and right        
         lbound = start_x + self.planned_r - self.boundary
         rbound = start_x + self.planned_r + self.boundary
-        
+  
         #choose the controller basing on the current position
-        if cur_x < lbound:
-            return self.right_turning_controller.control(position, kappa, *args, **kwargs)
-        elif cur_x > rbound:
-            return self.left_turning_controller.control(position, kappa, *args, **kwargs)
+        if abs(cur_x) < lbound:
+            return self.right_turning_controller.control(position, kappa, sign_omega, *args, **kwargs)
+        elif abs(cur_x) > rbound:
+            return self.left_turning_controller.control(position, kappa, sign_omega, *args, **kwargs)
         else:
-            return self.straight_controller.control(position, kappa, *args, **kwargs)
+            return self.straight_controller.control(position, kappa, sign_omega, *args, **kwargs)

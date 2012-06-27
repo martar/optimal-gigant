@@ -25,15 +25,15 @@ class Controller:
         pass
     
 
-    def desired_curvature(self, position, kappa, *args, **kwargs):
+    def desired_curvature(self, position, kappa, sign_omega, *args, **kwargs):
         '''
         returns a curvature that is decided to be the best in terms
         of skier performance on his route
         '''
         # TODO this is a method stub
-        return kappa
+        return kappa, sign_omega
     
-    def possible_curvature(self, desired_curvature, position, kappa, *args, **kwargs):
+    def possible_curvature(self, desired_curvature, position, kappa, sign_omega, *args, **kwargs):
         '''
         returns a curvature that is computed based on the result
         of desired_curvature and confronting this to physics
@@ -44,12 +44,12 @@ class Controller:
         # TODO logic should go here
         return desired_curvature
     
-    def control(self,position, kappa, *args, **kwargs):
+    def control(self,position, kappa, sign_omega, *args, **kwargs):
         '''
         this is a method that returns the next curvature
         that the racer should take in respect to provided conditions
         '''
-        desired_curvature = self.desired_curvature(position=position, kappa=kappa, *args, **kwargs)
-        possible_curvature = self.possible_curvature(desired_curvature=desired_curvature, position=position, kappa=kappa, *args, **kwargs)
+        desired_curvature = self.desired_curvature(position=position, kappa=kappa, sign_omega=sign_omega, *args, **kwargs)
+        possible_curvature = self.possible_curvature(desired_curvature=desired_curvature, position=position, kappa=kappa, sign_omega=sign_omega, *args, **kwargs)
         return possible_curvature
 
