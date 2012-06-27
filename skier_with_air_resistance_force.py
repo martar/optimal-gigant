@@ -30,15 +30,19 @@ def _vectorfield(w, t, params):
     # it's not the valu of the force -> no mass in eq
     f_r = f_R + sign_omega*g*sin(alfa)*cosinus
     
-    ''' 
+    '''
+    f_r can't be negative because it has to have the same sense (colloquially direction) 
+    as the f_R. 
+    If it is negative we decided to zero the F_R value so the skier goes straight.    
+    '''
     if f_r < 0:
         f_r = sign_omega*g*sin(alfa)*cosinus
         f_R = 0
-    '''
+    
      
-    '''todo wiki
-    na sile nacisku wplywa tez sila od�rodkowa, jak jad� po kole to tarcie si� zwi�ksza, 
-    i wida� �e jak jad� na wprost to mog� dalej pojecha�
+    '''
+    The pressing force is the composition of the centripetal force 
+    and component of the gravity force.
     '''
     N = sqrt ( (g*cos(alfa))**2 + (f_R)**2 )
     
