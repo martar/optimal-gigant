@@ -64,8 +64,8 @@ if __name__ == '__main__':
                                     left_turning_controller=LeftTurnController(kappa),
                                     straight_controller=StraightGoingController(), 
                                     kappa=kappa, boundary_val=0.2)
-    racer = Skier(mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom,solver, kappa_controller_A)
-    racer2 = Skier(mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom, solver, kappa_controller_B)
+    racer = Skier(mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom,solver, kappa_controller_A, color="red")
+    racer2 = Skier(mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom, solver, kappa_controller_B, color="yellow")
 
     sim = SkierSimulation(distance=200, interval=0.01, time_zoom=100)
     sim.add_racer(racer)

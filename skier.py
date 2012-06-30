@@ -4,7 +4,7 @@ class Skier:
     '''
     Model of the skier
     '''
-    def __init__(self, mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom, solver, kappa_controller, sign_omega=-1):
+    def __init__(self, mi, alfa, k1, k2, B, m, x0, v0, kappa, slalom, solver, kappa_controller, color="blue",  sign_omega=-1):
         '''
         Model of the skier. Arguments that models the races:
         Arguments:
@@ -26,6 +26,8 @@ class Skier:
                     1, when skier turns left
                     0, when skier go straigth
                     -1, when skier turns right
+            color - string describing the color of the racei in the simulation (just for the convinience) basic collors like
+                blue, red, yellow etc are supported
         '''
         self.mi, self.alfa, self.k1, self.k2, self.B, self.m= mi, alfa, k1, k2, B,  m
         self.slalom = slalom
@@ -36,7 +38,7 @@ class Skier:
         self.velocities = [v0]
         self.kappas = [kappa]
         self.sign_omegas = [sign_omega]
-        
+        self.color = color
         # time in second of the finish. None if not finished yet
         self.result = None
     

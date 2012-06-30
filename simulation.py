@@ -1,5 +1,6 @@
 import visual
 from visual import mag
+import random
 
 class SkierSimulation:
     '''
@@ -68,8 +69,14 @@ class SkierSimulation:
         visual.box(pos=(0,0,0), size=(12,0.2,12), color=visual.color.green)
         # create the visual objects that represent the racers (balls)
         balls = [ visual.sphere(pos=(index,0,0), radius=0.5) for index in xrange(len(self.racers))]
-        for ball in balls:
-            ball.trail  = visual.curve(color=visual.color.blue)
+        for ball, racer in zip(balls, self.racers):
+            color = visual.color.blue
+            try:
+                # try to set the color given by a string
+                color = getattr(visual.color, racer.color)
+            except AttributeError:
+                pass
+            ball.trail  = visual.curve(color=color)
         while not reduce(lambda x, y: x and y, [racer.result for racer in self.racers]):
             # slow down the looping - allow only self.time_calibration
             # number of loop entries for a second
